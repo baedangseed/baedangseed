@@ -110,6 +110,20 @@ article.g h2{font-family:var(--display);font-weight:800;font-size:1.25rem}
 article.g p{margin:0;max-width:65ch}
 footer{border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;padding-block:20px 30px}
 footer p{margin:0 0 6px;max-width:70ch}
+.f-links{display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:14px}
+.f-links a,.f-links button{background:none;border:0;padding:0;font:inherit;font-size:.82rem;color:var(--fg);text-decoration:none;cursor:pointer;opacity:.85}
+.f-links>*+*::before{content:"·";margin:0 10px;color:var(--muted);opacity:.6}
+.f-asof{font-size:.76rem}
+.f-asof b{font-weight:600}
+.f-more{margin:2px 0 14px}
+.f-more summary{cursor:pointer;font-size:.76rem;color:var(--muted);list-style:none;display:inline-block}
+.f-more summary::-webkit-details-marker{display:none}
+.f-more summary::after{content:" ›";display:inline-block;transition:transform .2s}
+.f-more[open] summary::after{transform:rotate(90deg)}
+.f-more p{margin-top:8px;font-size:.74rem;line-height:1.6}
+.f-tags{opacity:.7}
+.f-legal{font-size:.72rem;line-height:1.6;opacity:.75;padding-top:12px;border-top:1px solid var(--line)}
+.f-copy{font-size:.7rem;opacity:.5;margin-top:10px}
 .empty{color:var(--muted);padding:14px;text-align:center;font-size:.9rem}
 /* 직접 배너 */
 .bn{display:flex;flex-direction:column;gap:4px}
@@ -528,11 +542,14 @@ footer p{margin:0 0 6px;max-width:70ch}
 </div></main>
 
 <footer class="gut"><div class="in">
-  <p style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px"><button class="asklink openAsk" style="align-self:auto">광고 문의</button><a href="#privacy">개인정보처리방침</a><a href="#guide">절세 가이드</a></p>
-  <p>미국주식 배당금 · SCHD 배당금 · JEPI 배당률 · JEPQ 배당일 · QQQ 배당 · S&amp;P500 ETF 배당 · 커버드콜 ETF 분배금 · 해외주식 양도소득세 계산 · 미국주식 배당소득세 · 금융소득종합과세 2,000만 원</p>
-  <p id="foot-asof">주가는 같은 날 종가로 맞추고, 연 배당은 출처(나스닥·ChartRow)와 같은 기준으로 계산합니다: 배당이 일정한 종목은 최근 1회 × 연 지급 횟수, 매번 바뀌는 ETF는 최근 1년 실제 지급 합계. 출처 공시값과 5% 넘게 다른 종목은 '데이터 확인 중'으로 표시하고 순위에서 뺍니다.</p>
-  <p>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
-  <p>이 사이트의 계산은 참고용이며 투자 권유가 아닙니다. 정확한 세액은 홈택스나 세무사에게 확인하세요.</p>
+  <nav class="f-links"><button class="openAsk">광고 문의</button><a href="#guide">절세 가이드</a><a href="#privacy">개인정보처리방침</a></nav>
+  <p class="f-asof"><span id="foot-asof">데이터 기준</span> · 출처 나스닥·ChartRow</p>
+  <details class="f-more"><summary>계산 기준 보기</summary>
+    <p>주가와 배당은 같은 날 종가 기준으로 맞춥니다. 배당이 일정한 종목은 최근 지급액 × 연 지급 횟수, 분배금이 매번 바뀌는 ETF는 최근 1년 실제 지급 합계로 계산합니다. 출처 공시값과 5% 이상 차이 나는 종목은 '데이터 확인 중'으로 표시하고 순위에서 제외합니다.</p>
+    <p class="f-tags">미국주식 배당금 · SCHD 배당금 · JEPI 배당률 · JEPQ 배당일 · QQQ 배당 · S&amp;P500 ETF 배당 · 커버드콜 ETF 분배금 · 해외주식 양도소득세 계산 · 미국주식 배당소득세 · 금융소득종합과세 2,000만 원</p>
+  </details>
+  <p class="f-legal">모든 계산은 참고용이며 투자 권유가 아닙니다. 정확한 세액은 홈택스 또는 세무사를 통해 확인하세요.<br>이 사이트는 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다.</p>
+  <p class="f-copy">© 2026 새싹 미국주식 배당시드</p>
 </div></footer>
 
 <div class="modal" id="ask" hidden role="dialog" aria-modal="true" aria-labelledby="ask-t">
@@ -1040,7 +1057,7 @@ function loaderDone(){$('prog').style.width='100%';$('ld-msg').textContent='준�
 $('ld-go').addEventListener('click',e=>{e.stopPropagation();['click','keydown'].forEach(ev=>document.removeEventListener(ev,firstTouch));if(!Music.on)musicStart(true);$('loader').classList.add('out');maybeInst()});
 fetch('data.json').then(r=>{$('prog').style.width='70%';return r.json()}).then(j=>{
   DB=j;DB.t.forEach(t=>MAP[t[0]]=t);
-  $('foot-asof').insertAdjacentHTML('afterbegin',`<b>${(DB.asof||'').replace(/-/g,'.')} 종가 기준.</b> `);
+  $('foot-asof').innerHTML=`<b>${(DB.asof||'').replace(/-/g,'.')} 종가 기준</b>`;
   if(DB.fx&&DB.fx.rate){FX=DB.fx.rate;['c-fx','l-fx','my-fx','d-fx'].forEach(id=>$(id).value=FX)}
   document.querySelectorAll('.fxline').forEach(p=>p.textContent=fxText());
   renderHome();renderCal();initTrades();calcGain();calcDiv();
