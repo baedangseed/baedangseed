@@ -388,7 +388,9 @@ footer p{margin:0 0 6px;max-width:70ch}
     </div>
     <div id="p-gain" class="view" style="gap:14px">
       <div class="box"><h2>올해 팔았거나 팔 종목 <small style="color:var(--muted);font-weight:400">(예시 입력됨)</small></h2><p class="lead" style="font-size:.84rem;margin:0">종목을 검색해서 누르면 현재가가 팔 가격으로 들어옵니다. 수량과 평균 매수가만 넣으면 세금이 계산돼요.</p><div id="trades"></div><button class="btn" id="add">+ 종목 추가</button></div>
-      <div class="box"><label>매매·환전 수수료 합계 (원)<input id="fee" inputmode="numeric" value="50,000"></label></div>
+      <div class="box"><label>매매·환전 수수료 합계 (원) · 모르면 0<input id="fee" inputmode="numeric" value="0"></label>
+      <p class="lead" style="margin:0;font-size:.82rem">증권사에 낸 매매 수수료와 환전 수수료는 이익에서 빼 주기 때문에(필요경비) 넣으면 세금이 줄어요. 정확한 금액은 증권사 앱의 '양도소득세 계산 내역'에서 볼 수 있어요.</p>
+      <button class="btn" id="fee-est" style="align-self:flex-start;padding:6px 12px;font-size:.84rem">대략 계산하기 (거래금액의 0.25%)</button></div>
       <div class="box receipt">
         <div class="r"><span>손익통산 양도차익</span><span id="g-sum"></span></div>
         <div class="r"><span>수수료(필요경비)</span><span id="g-fee"></span></div>
@@ -998,6 +1000,7 @@ function saveTrades(){if(!TRADES_TOUCHED)return;const list=[...document.querySel
   try{localStorage.setItem('trades',JSON.stringify(list))}catch(e){}}
 $('p-gain').addEventListener('input',()=>{TRADES_TOUCHED=true;setTimeout(saveTrades,0)});
 $('p-gain').addEventListener('click',e=>{if(e.target.closest('[data-del]')||e.target.closest('.results a')){TRADES_TOUCHED=true;setTimeout(saveTrades,50)}});
+$('fee-est').addEventListener('click',()=>{let amt=0;document.querySelectorAll('.trade').forEach(el=>{const i=el.dataset.i,q=num($('q'+i).value);amt+=q*num($('b'+i).value)*num($('bf'+i).value)+q*num($('s'+i).value)*num($('sf'+i).value)});$('fee').value=won(amt*0.0025);calcGain();toast('보통 증권사 수수료(약 0.25%)로 대략 계산했어요. 증권사마다 달라요')});
 $('add').addEventListener('click',()=>{addTrade();calcGain();$('n'+(seq-1)).focus()});
 function calcGain(){
   let sum=0;document.querySelectorAll('.trade').forEach(el=>{const i=el.dataset.i;
