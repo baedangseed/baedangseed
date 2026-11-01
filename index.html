@@ -244,6 +244,12 @@ footer p{margin:0 0 6px;max-width:70ch}
 .rqm{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px}
 .rqm div{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:.86rem}
 .star{border:0;background:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:2px 6px}
+.cpbox{display:flex;gap:16px;align-items:center;justify-content:space-between;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:16px}
+.cptxt{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cptxt span{color:var(--muted);font-size:.86rem}
+.cptxt .btn{align-self:flex-start}
+.cptxt small{color:var(--muted);font-size:.72rem;line-height:1.4}
+.cpbox iframe{flex:0 0 auto;border-radius:8px;background:#fff}
 @media (max-width:620px){.cards{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.results li a{grid-template-columns:62px 1fr auto}}
 @media (prefers-reduced-motion:no-preference){.chip,.card{transition:border-color .15s}}
 </style>
@@ -497,6 +503,7 @@ footer p{margin:0 0 6px;max-width:70ch}
   <p style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px"><button class="asklink openAsk" style="align-self:auto">광고 문의</button><a href="#privacy">개인정보처리방침</a><a href="#guide">절세 가이드</a></p>
   <p>미국주식 배당금 · SCHD 배당금 · JEPI 배당률 · JEPQ 배당일 · QQQ 배당 · S&amp;P500 ETF 배당 · 커버드콜 ETF 분배금 · 해외주식 양도소득세 계산 · 미국주식 배당소득세 · 금융소득종합과세 2,000만 원</p>
   <p id="foot-asof">주가는 같은 날 종가로 맞추고, 연 배당은 출처(나스닥·ChartRow)와 같은 기준으로 계산합니다: 배당이 일정한 종목은 최근 1회 × 연 지급 횟수, 매번 바뀌는 ETF는 최근 1년 실제 지급 합계. 출처 공시값과 5% 넘게 다른 종목은 '데이터 확인 중'으로 표시하고 순위에서 뺍니다.</p>
+  <p>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
   <p>이 사이트의 계산은 참고용이며 투자 권유가 아닙니다. 정확한 세액은 홈택스나 세무사에게 확인하세요.</p>
 </div></footer>
 
@@ -785,6 +792,8 @@ function renderBanners(root){
     const list=ADS.banners.filter(b=>(b.slots||['all']).some(x=>x==='all'||x===k)&&(!b.start||b.start<=t)&&(!b.end||t<=b.end)&&(!b.tickers||!b.tickers.length||(tk&&b.tickers.includes(tk))));
     if(list.length){const b=list[Math.floor(Math.random()*list.length)];
       slot.innerHTML=`<a href="${esc(b.link)}" target="_blank" rel="noopener sponsored"><img src="${esc(b.img)}" alt="${esc(b.alt||b.advertiser||'광고')}"><span class="lbl">광고</span></a>`;}
+    else if(ADS.coupang&&ADS.coupang.length){const c=ADS.coupang[Math.floor(Math.random()*ADS.coupang.length)];
+      slot.innerHTML=`<div class="cpbox"><div class="cptxt"><b>배당 투자자 추천</b><span>미국주식·배당 투자에 도움 되는 상품이에요</span><a class="btn pri" href="${esc(c.link)}" target="_blank" rel="noopener sponsored">쿠팡에서 보기</a><small>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</small></div><iframe src="${esc(c.iframe)}" width="${c.w}" height="${c.h}" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" loading="lazy" title="쿠팡 추천 상품"></iframe></div>`;}
     else if(k==='home'||k==='detail'){slot.innerHTML=`<div class="house"><div><b>이 자리에 광고를 실어보세요</b><br><span>미국주식 투자자가 매일 보는 자리 · 1200×400 배너</span></div><button class="openAsk">광고 문의</button></div>`;}
     else{slot.innerHTML='<div class="ad">광고 영역 (Google 애드센스)</div><button class="asklink openAsk">광고 문의</button>';}
   });
