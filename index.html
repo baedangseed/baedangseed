@@ -250,6 +250,14 @@ footer p{margin:0 0 6px;max-width:70ch}
 .cptxt .btn{align-self:flex-start}
 .cptxt small{color:var(--muted);font-size:.72rem;line-height:1.4}
 .cpbox iframe{flex:0 0 auto;border-radius:8px;background:#fff}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.wcard{position:relative;display:flex;flex-direction:column;gap:2px;text-decoration:none;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.wcard .tk{font-size:1rem}
+.wcard .nm2{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wcard .row2{display:flex;justify-content:space-between;gap:6px;font-size:.84rem;font-variant-numeric:tabular-nums}
+.wcard .row2 b{color:var(--accent)}
+.wcard .nx{font-size:.74rem;color:var(--muted)}
+.wcard .star{position:absolute;top:6px;right:4px}
 @media (max-width:620px){.cards{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.results li a{grid-template-columns:62px 1fr auto}}
 @media (prefers-reduced-motion:no-preference){.chip,.card{transition:border-color .15s}}
 </style>
@@ -313,6 +321,11 @@ footer p{margin:0 0 6px;max-width:70ch}
     <div class="search">
       <input id="q-home" type="text" placeholder="종목 검색 · 예) 슈드, 테슬라, JEPQ" autocomplete="off" aria-label="종목 검색">
       <ul class="results" id="r-home" hidden></ul>
+    </div>
+    <div class="box" id="wbox">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2>★ 내 관심 종목</h2><a href="#calendar" style="font-size:.84rem;color:var(--accent)">배당 일정 보기 →</a></div>
+      <div class="search"><input id="q-hw" type="text" placeholder="관심 종목 추가 · 예) SCHD, 테슬라" autocomplete="off" aria-label="관심 종목 추가"><ul class="results" id="r-hw" hidden></ul></div>
+      <div class="wgrid" id="wlist"></div>
     </div>
     <div>
       <h2 style="margin-bottom:10px">서학개미 단골 배당주</h2>
@@ -598,6 +611,7 @@ function route(){
   if(v==='stocks')renderList();
   if(v==='my')renderMy();
   if(v==='calendar')renderCal();
+  if(v==='home')renderWatch();
   if(v==='compare')renderCmp();
   if(v==='legends')renderLegends();
   window.scrollTo(0,0);
@@ -905,6 +919,14 @@ let WATCH=[];try{WATCH=JSON.parse(localStorage.getItem('watch')||'[]')}catch(e){
 let CALM='watch';
 const watchSet=()=>new Set([...WATCH,...(HOLD_SAMPLE?[]:HOLD.map(x=>x.s))]);
 function toggleWatch(s){const i=WATCH.indexOf(s);if(i>=0)WATCH.splice(i,1);else WATCH.push(s);try{localStorage.setItem('watch',JSON.stringify(WATCH))}catch(e){}}
+const STEP={'주배당':7,'월배당':30.4,'분기배당':91.3,'반기배당':182,'연배당':365,'반기·연배당':182};
+function nextEx(d){if(!d||!d.h[0]||!d.h[0][0])return null;let dt=new Date(d.h[0][0]);const st=STEP[d.f]||91.3,today=new Date(todayKST());let g=0;while(dt<today&&g++<60)dt=new Date(dt.getTime()+st*864e5);return dt}
+function renderWatch(){if(!DB)return;const ws=[...watchSet()];
+  $('wlist').innerHTML=ws.length?ws.filter(s=>MAP[s]).map(s=>{const t=MAP[s],d=DB.d[s],y=yieldOf(s),nx=nextEx(d);
+    return `<a class="wcard" href="#${slug(s)}"><button class="star" data-w="${esc(s)}" aria-label="${esc(s)} 관심 해제">${WATCH.includes(s)?'★':'☆'}</button><span class="tk">${esc(s)}</span><span class="nm2">${esc((DB.kr[s]||t[1]).split(' ')[0])}</span>
+      <span class="row2"><span>${usd(t[2])}</span><b>${y!=null?y.toFixed(2)+'%':'배당 없음'}</b></span>${nx?`<span class="nx">다음 배당락 예상 ${nx.getMonth()+1}/${nx.getDate()}${d.f?' · '+d.f:''}</span>`:''}</a>`}).join('')
+   :'<p class="lead" style="margin:0;font-size:.86rem">위 검색창에서 종목을 넣거나, 종목 화면의 ☆를 누르면 여기에 모여요. 내 배당에 넣은 종목도 자동으로 들어와요.</p>';
+}
 function renderCal(){
   const step={'주배당':7,'월배당':30.4,'분기배당':91.3,'반기·연배당':182};
   const today=new Date('2026-11-01'),end=new Date('2026-12-31');const ev=[];
@@ -921,6 +943,7 @@ function renderCal(){
 }
 $('cal-f').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;CALM=b.dataset.c;$('cal-f').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderCal()});
 $('cal').addEventListener('click',e=>{const b=e.target.closest('.star');if(!b)return;toggleWatch(b.dataset.w);renderCal()});
+$('wlist').addEventListener('click',e=>{const b=e.target.closest('.star');if(!b)return;e.preventDefault();e.stopPropagation();toggleWatch(b.dataset.w);renderWatch()});
 // 세금 계산기
 const tabs=[['t-gain','p-gain'],['t-div','p-div']];
 tabs.forEach(([t,p])=>$(t).addEventListener('click',()=>tabs.forEach(([t2,p2])=>{$(t2).setAttribute('aria-selected',t2===t);$(p2).hidden=p2!==p})));
@@ -991,6 +1014,7 @@ fetch('data.json').then(r=>{$('prog').style.width='70%';return r.json()}).then(j
   $('filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;FILTER=b.dataset.f;
     $('filters').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderList()});
   bindSearch($('q-cmp'),$('r-cmp'),6,s=>{if(!CMP.includes(s)){if(CMP.length>=4)CMP.shift();CMP.push(s)}$('q-cmp').value='';renderCmp()});
+  bindSearch($('q-hw'),$('r-hw'),6,s=>{if(!WATCH.includes(s))toggleWatch(s);$('q-hw').value='';renderWatch()});
   bindSearch($('q-watch'),$('r-watch'),6,s=>{if(!WATCH.includes(s))toggleWatch(s);$('q-watch').value='';renderCal()});
   bindSearch($('q-my'),$('r-my'),6,s=>{if(HOLD_SAMPLE){HOLD=[];HOLD_SAMPLE=false}if(!HOLD.find(h=>h.s===s))HOLD.push({s,q:10});$('q-my').value='';saveHold()});
   bindSearch($('d-name'),$('r-calc'),6,s=>{$('d-name').value=s;const d=DB.d[s];$('d-dps').value=d?d.a:0;calcDiv()});
