@@ -938,8 +938,8 @@ function renderMy(onlyNums){
   const w=g*.15,n=g-w,total=g+num($('my-etc').value);
   $('m-inv').textContent=won(inv)+'원';$('m-g').textContent=won(g);$('m-w').textContent='− '+won(w);$('m-avg').textContent=won(n/12);$('m-gavg').textContent=won(g/12);$('m-n').textContent=won(n)+'원';
   const room=2e7-total,tip=$('m-tip');
-  if(room>=0){tip.className='note';tip.innerHTML=`금융소득 2,000만 원까지 <strong>${won(room)}원</strong> 남았습니다. 이 안에서는 미국에서 뗀 15%로 세금이 끝납니다.`}
-  else{tip.className='note warn';tip.innerHTML=`<strong>금융소득이 2,000만 원을 ${won(-room)}원 넘습니다.</strong> 초과분은 5월에 종합과세됩니다. 일부를 ISA·연금계좌로 옮기는 방법을 검토해 보세요.`}
+  if(room>=0){tip.className='note';tip.innerHTML=`<strong>종합과세 기준까지 ${won(room)}원 여유</strong><br>연간 금융소득 2,000만 원 이내로, 미국 현지 원천징수(15%)만으로 과세가 마무리됩니다. 국내 추가 납부 세액은 없습니다.`}
+  else{tip.className='note warn';tip.innerHTML=`<strong>종합과세 기준을 ${won(-room)}원 초과</strong><br>초과분은 이듬해 5월 근로소득 등과 합산해 종합과세됩니다. 일부 자산을 ISA·연금저축 계좌로 분산하면 세 부담을 줄일 수 있습니다.`}
 }
 $('holds').addEventListener('input',e=>{const i=e.target.dataset.i;if(i==null)return;if(HOLD_SAMPLE){HOLD_SAMPLE=false}HOLD[i].q=num(e.target.value);try{localStorage.setItem('hold',JSON.stringify(HOLD))}catch(x){}renderMy(true)});
 $('holds').addEventListener('click',e=>{const i=e.target.dataset.d;if(i==null)return;HOLD.splice(i,1);HOLD_SAMPLE=false;try{localStorage.setItem('hold',JSON.stringify(HOLD))}catch(x){}if(!HOLD.length){$('holds').innerHTML='<p class="empty">종목을 추가해 보세요</p>';$('bars').innerHTML='';['m-inv','m-g','m-w','m-gavg','m-avg','m-n'].forEach(k=>$(k).textContent='0');$('m-tip').textContent='';return}renderMy()});
@@ -1020,8 +1020,8 @@ function calcDiv(){
   $('d-gross').textContent=won(gross);$('d-wh').textContent='− '+won(wh);$('d-kr').textContent=total>2e7?'종합과세 대상':'0 (미국에서 끝)';
   $('d-month').textContent=won(net/12);$('d-gmonth').textContent=won(gross/12);$('d-net').textContent=won(net)+'원';
   const room=2e7-total,tip=$('d-tip');
-  if(room>=0){tip.className='note';tip.innerHTML=`금융소득 2,000만 원까지 <strong>${won(room)}원</strong> 여유가 있습니다. 추가로 낼 세금은 없습니다.`}
-  else{tip.className='note warn';tip.innerHTML=`<strong>금융소득이 2,000만 원을 ${won(-room)}원 넘습니다.</strong> 초과분은 5월에 근로소득과 합쳐 종합과세됩니다.`}
+  if(room>=0){tip.className='note';tip.innerHTML=`<strong>종합과세 기준까지 ${won(room)}원 여유</strong><br>미국 현지 원천징수(15%)만으로 과세가 마무리되어, 국내 추가 납부 세액은 없습니다.`}
+  else{tip.className='note warn';tip.innerHTML=`<strong>종합과세 기준을 ${won(-room)}원 초과</strong><br>초과분은 이듬해 5월 근로소득 등과 합산해 종합과세됩니다.`}
 }
 $('v-calc').addEventListener('input',e=>{if(e.target.closest('#p-gain'))calcGain();else calcDiv()});
 
