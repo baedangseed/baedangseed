@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://baedangseed.pages.dev/sitemap.xml
